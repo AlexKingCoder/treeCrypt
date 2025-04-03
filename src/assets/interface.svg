@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Pantalla -->
+    <rect x="20" y="20" width="80" height="80" rx="8" stroke="#4CAF50" stroke-width="3" fill="none"/>
+    
+    <!-- Barra de título -->
+    <rect x="20" y="20" width="80" height="15" rx="8" fill="#4CAF50"/>
+    
+    <!-- Tic verde -->
+    <path d="M40 60 L55 75 L80 45" 
+          stroke="#4CAF50" 
+          stroke-width="6" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+</svg> 

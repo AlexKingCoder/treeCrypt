@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Cuerpo del USB -->
+    <rect x="40" y="30" width="40" height="60" rx="4" stroke="#4CAF50" stroke-width="3" fill="none"/>
+    
+    <!-- Conector USB -->
+    <rect x="35" y="85" width="50" height="5" rx="2" fill="#4CAF50"/>
+    <rect x="45" y="90" width="30" height="3" rx="1" fill="#4CAF50"/>
+    
+    <!-- Detalles del USB -->
+    <rect x="45" y="35" width="30" height="10" rx="2" stroke="#4CAF50" stroke-width="2" fill="none"/>
+    <rect x="45" y="50" width="30" height="10" rx="2" stroke="#4CAF50" stroke-width="2" fill="none"/>
+    <rect x="45" y="65" width="30" height="10" rx="2" stroke="#4CAF50" stroke-width="2" fill="none"/>
+</svg> 
