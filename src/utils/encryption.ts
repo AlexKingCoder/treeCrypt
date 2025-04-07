@@ -133,7 +133,8 @@ export async function encryptFile(
         noisePositions,
         xorKey: Array.from(xorKey),
         rotationValues: [1, 2, 3, 4, 5, 6, 7, 8],
-        paddingSizes
+        paddingSizes,
+        passwordHash: CryptoJS.SHA256(password).toString()
     };
 
     // Verificar integridad
@@ -158,10 +159,15 @@ export async function decryptFile(
     password: string,
     onProgress?: ProgressCallback
 ): Promise<ArrayBuffer> {
+    // Verificar contraseña
+    const providedPasswordHash = CryptoJS.SHA256(password).toString();
+    if (providedPasswordHash !== keyFile.passwordHash) {
+        throw new Error('Contraseña incorrecta');
+    }
+
     // Verificar integridad inicial
     onProgress?.('Verificando integridad inicial', 0.1);
-    const encryptedBytes = new Uint8Array(encryptedData);
-    verifyByteIntegrity(encryptedBytes, 'inicio');
+    verifyByteIntegrity(new Uint8Array(encryptedData), 'pre-diccionarios');
     
     // Aplicar diccionarios en orden inverso
     onProgress?.('Aplicando núcleos procedurales inversos', 0.2);

@@ -30,7 +30,8 @@ const DecryptPage: React.FC = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [decryptedFile, setDecryptedFile] = useState<DecryptedFile | null>(null);
-    const [progress, setProgress] = useState<{ stage: string; value: number } | null>(null);
+    const [progress, setProgress] = useState<number>(0);
+    const [progressMessage, setProgressMessage] = useState('');
     const [passwordError, setPasswordError] = useState<string | null>(null);
 
     const handleEncryptedFileSelect = useCallback((file: File) => {
@@ -58,13 +59,8 @@ const DecryptPage: React.FC = () => {
     }, []);
 
     const handleDecrypt = async () => {
-        if (!encryptedFile || !keyFile) {
-            setError('Por favor, selecciona ambos archivos');
-            return;
-        }
-
-        if (!password) {
-            setError('Por favor, ingresa la contraseña');
+        if (!encryptedFile || !keyFile || !password) {
+            setError('Por favor, completa todos los campos');
             return;
         }
 
@@ -80,36 +76,56 @@ const DecryptPage: React.FC = () => {
 
         setIsProcessing(true);
         setError(null);
-        setPasswordError(null);
-        setProgress({ stage: 'Iniciando...', value: 0 });
+        setProgress(0);
+        setProgressMessage('');
 
         try {
-            // Leer los archivos
-            const encryptedData = await encryptedFile.arrayBuffer();
+            // Leer el archivo de llave
             const keyFileText = await keyFile.text();
             const parsedKeyFile = JSON.parse(keyFileText) as KeyFile;
 
-            // Intentar desencriptar
             const decryptedData = await decryptFile(
-                encryptedData,
+                await encryptedFile.arrayBuffer(),
                 parsedKeyFile,
                 password,
-                (stage, value) => setProgress({ stage, value })
+                (message, progress) => {
+                    setProgressMessage(message);
+                    setProgress(progress);
+                }
             );
-            
-            // Obtener el nombre original del archivo
-            const originalFileName = encryptedFile.name.replace('.tree', '');
+
+            // Crear y descargar el archivo desencriptado
+            const blob = new Blob([decryptedData], { type: parsedKeyFile.mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = encryptedFile.name.replace('.tree', '');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            setProgressMessage('Desencriptación completada');
+            setProgress(1);
 
             setDecryptedFile({
                 content: decryptedData,
                 mimeType: parsedKeyFile.mimeType,
-                fileName: originalFileName
+                fileName: encryptedFile.name.replace('.tree', '')
             });
         } catch (err) {
-            setError('Error al desencriptar el archivo: ' + (err instanceof Error ? err.message : 'Error desconocido'));
+            if (err instanceof Error) {
+                if (err.message === 'Contraseña incorrecta') {
+                    setError('La contraseña proporcionada no es correcta');
+                } else {
+                    setError(`Error al desencriptar: ${err.message}`);
+                }
+            } else {
+                setError('Error desconocido al desencriptar');
+            }
+            setProgress(0);
         } finally {
             setIsProcessing(false);
-            setProgress(null);
         }
     };
 
@@ -216,14 +232,14 @@ const DecryptPage: React.FC = () => {
                     >
                         {isProcessing ? <CircularProgress size={24} color="inherit" /> : 'Desencriptar'}
                     </Button>
-                    {progress && (
+                    {progressMessage && (
                         <Box sx={{ width: '100%', mt: 2 }}>
                             <Typography variant="body2" color="text.secondary" gutterBottom>
-                                {progress.stage}
+                                {progressMessage}
                             </Typography>
                             <LinearProgress 
                                 variant="determinate" 
-                                value={progress.value * 100} 
+                                value={progress * 100} 
                                 sx={{ height: 8, borderRadius: 4 }}
                             />
                         </Box>

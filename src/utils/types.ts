@@ -18,6 +18,7 @@ export interface KeyFile {
     xorKey: number[];
     rotationValues: number[];
     paddingSizes: number[];
+    passwordHash: string;
 }
 
 /**
