@@ -232,6 +232,11 @@ const DecryptPage: React.FC = () => {
                     >
                         {isProcessing ? <CircularProgress size={24} color="inherit" /> : 'Desencriptar'}
                     </Button>
+                    {error && (
+                        <Alert severity="error" sx={{ mt: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
                     {progressMessage && (
                         <Box sx={{ width: '100%', mt: 2 }}>
                             <Typography variant="body2" color="text.secondary" gutterBottom>
